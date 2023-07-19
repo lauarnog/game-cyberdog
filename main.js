@@ -4,6 +4,8 @@ import { Background } from './background.js';
 import { FlyingEnemy, ClimbingEnemy, GroundEnemy } from './enemies.js';
 import { UI } from './UI.js';
 
+import { AI } from './AI/main.js';
+
 window.addEventListener('load', function() {
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
@@ -73,7 +75,6 @@ window.addEventListener('load', function() {
             this.particles = this.particles.filter(particle => !particle.markedForDeletion); 
             this.collisions = this.collisions.filter(collision => !collision.markedForDeletion);
             this.floatingMessages = this.floatingMessages.filter(message => !message.markedForDeletion);
-            console.log(this.enemies, this.particles, this.collisions, this.floatingMessages)
         }
         draw(context) {
             this.background.draw(context);
@@ -101,15 +102,18 @@ window.addEventListener('load', function() {
     }
 
     const game = new Game(canvas.width, canvas.height);
+    const ai = new AI(game);
     let lastTime = 0;
 
     function animate(timeStamp) {
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ai.update();
         game.update(deltaTime); 
         game.draw(ctx);
         if (!game.gameOver) requestAnimationFrame(animate);
+        else ai.reload();
     }
     animate(0);
 });
