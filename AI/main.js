@@ -16,7 +16,7 @@ export class AI {
     ];
     this.game.input = { keys: [] };
     this.bestScore = Number(localStorage.getItem('best-score') || 0);
-    this.rna = new RNA(2, [10, 5]);
+    this.rna = new RNA(4, [10, 10, 5]);
     this.rna.load();
     this.rna.mutate(0.2);
   }
@@ -44,13 +44,18 @@ export class AI {
     }
 
     const maxDistance = getDistance(player, topScreen);
+    const totalEnemies = Math.max(this.game.enemies.length, 1);
+    const enemiesR = this.game.enemies.filter(e => e.x >= player.x).length;
+    const enemiesL = this.game.enemies.filter(e => e.x < player.x).length;
 
     // Signals
     const offset = Math.min(1, getDistance(nearly, player) / maxDistance);
     const height =  nearly.y / topScreen.y;
+    const rightRate = enemiesR / totalEnemies;
+    const leftRate = enemiesL / totalEnemies;
 
     // Compute movements
-    const outputList = this.rna.compute([offset, height]);
+    const outputList = this.rna.compute([offset, height, rightRate, leftRate]);
     this.move(outputList);
   }
 }
